@@ -7,7 +7,7 @@
         <br />
         Each API endpoint has a different access control level.
         <br />
-        <strong>Only authenticated users should access this page.</strong>
+        <strong>Only authenticated users can access this page.</strong>
       </p>
 
       <div class="messages-grid">
@@ -16,7 +16,7 @@
         </div>
         <div class="messages-grid__options">
           <div
-            @click="getPublicResource"
+            @click="getPublicMessage"
             class="messages-grid__option"
             v-bind:class="{
               'messages-grid__option--active':
@@ -26,7 +26,7 @@
             Public
           </div>
           <div
-            @click="getProtectedResource"
+            @click="getProtectedMessage"
             class="messages-grid__option"
             v-bind:class="{
               'messages-grid__option--active':
@@ -36,7 +36,7 @@
             Protected
           </div>
           <div
-            @click="getRbacResource"
+            @click="getRbacMessage"
             class="messages-grid__option"
             v-bind:class="{
               'messages-grid__option--active':
@@ -46,7 +46,7 @@
             RBAC
           </div>
           <div
-            @click="checkCorsAllowedMethod"
+            @click="getCorsMessage"
             class="messages-grid__option"
             v-bind:class="{
               'messages-grid__option--active':
@@ -64,6 +64,7 @@
 
 <script lang="ts">
 import CodeSnippet from "@/components/code-snippet.vue";
+import { useAuth0 } from "@/services/auth0-plugin";
 import {
   AccessControlLevel,
   apiEndpoint,
@@ -83,10 +84,10 @@ export default {
     selectedAccessControlLevel: Ref<AccessControlLevel | null>;
     apiResponse: Ref<string>;
     apiEndpoint: Ref<string>;
-    getPublicResource: () => void;
-    getProtectedResource: () => void;
-    getRbacResource: () => void;
-    checkCorsAllowedMethod: () => void;
+    getPublicMessage: () => void;
+    getProtectedMessage: () => void;
+    getRbacMessage: () => void;
+    getCorsMessage: () => void;
     accessControlLevel: {
       public: AccessControlLevel;
       protected: AccessControlLevel;
@@ -94,14 +95,56 @@ export default {
       cors: AccessControlLevel;
     };
   } {
+    const auth0 = useAuth0();
+
+    const getAccessToken = async () => {
+      if (!auth0) {
+        return null;
+      }
+
+      return await auth0.getAccessToken();
+    };
+
+    const getPublicMessage = getPublicResource;
+
+    const getProtectedMessage = async () => {
+      const token = await getAccessToken();
+
+      if (!token) {
+        return null;
+      }
+
+      return getProtectedResource(token);
+    };
+
+    const getRbacMessage = async () => {
+      const token = await getAccessToken();
+
+      if (!token) {
+        return null;
+      }
+
+      return getRbacResource(token);
+    };
+
+    const getCorsMessage = async () => {
+      const token = await getAccessToken();
+
+      if (!token) {
+        return null;
+      }
+
+      return checkCorsAllowedMethod(token);
+    };
+
     return {
       selectedAccessControlLevel,
       apiResponse,
       apiEndpoint,
-      getPublicResource,
-      getProtectedResource,
-      getRbacResource,
-      checkCorsAllowedMethod,
+      getPublicMessage,
+      getProtectedMessage,
+      getRbacMessage,
+      getCorsMessage,
       accessControlLevel: {
         public: AccessControlLevel.PUBLIC,
         protected: AccessControlLevel.PROTECTED,

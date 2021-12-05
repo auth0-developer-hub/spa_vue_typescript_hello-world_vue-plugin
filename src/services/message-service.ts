@@ -15,8 +15,18 @@ export const apiResponse = ref<string>(
 );
 export const selectedAccessControlLevel = ref<AccessControlLevel | null>(null);
 
-const makeRequest = async (options: { config: AxiosRequestConfig }) => {
+const makeRequest = async (options: {
+  config: AxiosRequestConfig;
+  accessToken?: string;
+}) => {
   try {
+    if (options.accessToken) {
+      options.config.headers = {
+        ...options.config.headers,
+        Authorization: `Bearer ${options.accessToken}`,
+      };
+    }
+
     const response: AxiosResponse = await axios(options.config);
     const { data } = response;
 
@@ -48,7 +58,9 @@ export const getPublicResource = async (): Promise<void> => {
   apiResponse.value = JSON.stringify(data, null, 2);
 };
 
-export const getProtectedResource = async (): Promise<void> => {
+export const getProtectedResource = async (
+  accessToken: string
+): Promise<void> => {
   selectedAccessControlLevel.value = AccessControlLevel.PROTECTED;
 
   apiEndpoint.value = "GET /api/messages/protected";
@@ -61,12 +73,12 @@ export const getProtectedResource = async (): Promise<void> => {
     },
   };
 
-  const data = await makeRequest({ config });
+  const data = await makeRequest({ config, accessToken });
 
   apiResponse.value = JSON.stringify(data, null, 2);
 };
 
-export const getRbacResource = async (): Promise<void> => {
+export const getRbacResource = async (accessToken: string): Promise<void> => {
   selectedAccessControlLevel.value = AccessControlLevel.RBAC;
 
   apiEndpoint.value = "GET /api/messages/admin";
@@ -79,12 +91,14 @@ export const getRbacResource = async (): Promise<void> => {
     },
   };
 
-  const data = await makeRequest({ config });
+  const data = await makeRequest({ config, accessToken });
 
   apiResponse.value = JSON.stringify(data, null, 2);
 };
 
-export const checkCorsAllowedMethod = async (): Promise<void> => {
+export const checkCorsAllowedMethod = async (
+  accessToken: string
+): Promise<void> => {
   selectedAccessControlLevel.value = AccessControlLevel.CORS;
 
   apiEndpoint.value = "DELETE /api/messages/public";
@@ -97,7 +111,7 @@ export const checkCorsAllowedMethod = async (): Promise<void> => {
     },
   };
 
-  const data = await makeRequest({ config });
+  const data = await makeRequest({ config, accessToken });
 
   apiResponse.value = JSON.stringify(data, null, 2);
 };

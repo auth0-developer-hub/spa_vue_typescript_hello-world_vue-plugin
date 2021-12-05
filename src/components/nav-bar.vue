@@ -30,12 +30,18 @@
           External API
         </router-link>
       </div>
+      <div class="nav-bar__actions">
+        <AuthenticationButton />
+      </div>
     </nav>
   </div>
 </template>
 
 <script lang="ts">
+import AuthenticationButton from "@/components/buttons/authentication-button.vue";
+
 export default {
   name: "NavBar",
+  components: { AuthenticationButton },
 };
 </script>
