@@ -24,14 +24,13 @@
 <script lang="ts">
 import CodeSnippet from "@/components/code-snippet.vue";
 import { UserProfile } from "@/models/user-profile";
-import { computed, ComputedRef } from "vue";
 
 export default {
   name: "Profile",
   components: { CodeSnippet },
   setup(): {
     user: UserProfile;
-    code: ComputedRef<string>;
+    code: string;
   } {
     const user: UserProfile = {
       nickname: "Alex",
@@ -43,7 +42,7 @@ export default {
       sub: "auth0|12345678901234567890",
     };
 
-    const code = computed((): string => JSON.stringify(user, null, 2));
+    const code = JSON.stringify(user, null, 2);
 
     return {
       user,
