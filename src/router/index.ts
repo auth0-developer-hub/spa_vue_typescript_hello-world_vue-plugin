@@ -1,3 +1,4 @@
+import Callback from "@/components/callback.vue";
 import Home from "@/pages/home.vue";
 import NotFound from "@/pages/not-found.vue";
 import { authenticationGuard } from "@/services/authentication-guard";
@@ -28,7 +29,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/callback",
     name: "callback",
-    component: [],
+    component: Callback,
   },
   {
     path: "/:catchAll(.*)",
